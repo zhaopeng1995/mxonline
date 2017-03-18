@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from users.forms import LoginForm, RegisterForm, ForgetPwdForm
+from users.forms import LoginForm, RegisterForm, ForgetPwdForm, ModifyPwdForm
 from users.models import UserProfile, EmailVerifyRecord
 from utils.email_send import send_register_email
 
@@ -47,14 +47,14 @@ class LoginView(View):
 class RegisterView(View):
     def get(self, request):
         register_form = RegisterForm(request.POST)
-        return render(request, 'register.html', {'register_form':register_form})
+        return render(request, 'register.html', {'register_form': register_form})
 
     def post(self, request):
         register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             user_name = request.POST.get("email", "")
             if UserProfile.objects.filter(email=user_name):
-                return render(request, "register.html", {"register_form":register_form, "msg":"该邮箱已经注册"})
+                return render(request, "register.html", {"register_form": register_form, "msg": "该邮箱已经注册"})
             pass_word = request.POST.get("password", "")
             user_profile = UserProfile()
             user_profile.username = user_name
@@ -66,14 +66,14 @@ class RegisterView(View):
             return render(request, "login.html")
         else:
             print(u"验证码错误")
-            return render(request, 'register.html', {"register_form": register_form, "msg":"验证码错误"})
+            return render(request, 'register.html', {"register_form": register_form, "msg": "验证码错误"})
 
 
 class ActiveUserView(View):
-    def get(self,request, active_code):
-        all_record = EmailVerifyRecord.objects.filter(code= active_code)
+    def get(self, request, active_code):
+        all_record = EmailVerifyRecord.objects.filter(code=active_code)
         if all_record:
-            for record in  all_record:
+            for record in all_record:
                 email = record.email
                 user = UserProfile.objects.get(email=email)
                 user.is_active = True
@@ -89,11 +89,44 @@ class ForgetPwdView(View):
         return render(request, "forgetpwd.html", {"forgetpwd_form": forgetpwd_form})
 
     def post(self, request):
-        forgetpwd_form = ForgetPwdForm(request)
+        forgetpwd_form = ForgetPwdForm(request.POST)
         if forgetpwd_form.is_valid():
-            email = request.POST.get("email","")
+            email = request.POST.get("email", "")
             send_register_email(email, "forget")
+            return render(request, "send_success.html", {"email":email})
+        else:
+            print(u"验证码错误")
+            return render(request, 'register.html', {"forget_form": forgetpwd_form, "msg": "验证码错误"})
 
+
+class ResetView(View):
+    def get(self, request, active_code):
+        all_record = EmailVerifyRecord.objects.filter(code=active_code)
+        if all_record :
+            for record in all_record:
+                email = record.email
+                record.is_used = True
+            return render(request, "password_reset.html", {"email": email})
+        else:
+            return render(request, "active_fail.html")
+
+
+class ModifyPwdView(View):
+    def post(self, request):
+        modify_form = ModifyPwdForm(request.POST)
+        if modify_form.is_valid():
+            pwd1 = request.POST.get("password1", "")
+            pwd2 = request.POST.get("password2", "")
+            email = request.POST.get("email", "")
+            if pwd1 != pwd2:
+                return render(request, 'password_reset.html', {"email":email, "msg": "密码不一致"})
+            user = UserProfile.objects.get(email=email)
+            user.password = make_password(pwd2)
+            user.save()
+            return render(request, "login.html")
+        else:
+            email = request.POST.get("email", "")
+            return render(request, 'password_reset.html', {"email":email, "modify_form": modify_form})
 
 # def userlogin(request):
 #     if request.method == "POST":
@@ -107,5 +140,3 @@ class ForgetPwdView(View):
 #             return render(request, "login.html", {"msg": u"用户名或密码错误！"})
 #     if request.method == "GET":
 #         return render(request, 'login.html', {})
-
-
