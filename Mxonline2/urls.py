@@ -19,7 +19,9 @@ from django.conf.urls import url, include
 from django.contrib import admin
 import xadmin
 from django.views.generic import TemplateView
+from django.views.static import serve
 
+from Mxonline2.settings import MEDIA_ROOT
 from organization.views import OrgView
 from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView
 
@@ -36,5 +38,7 @@ urlpatterns = [
     url(r'^modifypwd/$', ModifyPwdView.as_view(), name='modifypwd'),
     # 课程机构首页
     url(r'^orglist/$', OrgView.as_view(), name='org_list'),
+
+    url(r'^media/(?P<path>.*)$', serve, {"document_root":MEDIA_ROOT}),
 
 ]
