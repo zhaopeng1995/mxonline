@@ -36,9 +36,12 @@ urlpatterns = [
     url(r'^forgetpwd/$', ForgetPwdView.as_view(), name='forgetpwd'),
     url(r'^reset/(?P<active_code>.*)/$', ResetView.as_view(), name='resetpwd'),
     url(r'^modifypwd/$', ModifyPwdView.as_view(), name='modifypwd'),
-    # 课程机构首页
-    url(r'^orglist/$', OrgView.as_view(), name='org_list'),
+    # 课程机构url配置
+    url(r'^org/', include('organization.urls',namespace='org')),
+    # 课程url配置
+    url(r'^course/', include('course.urls',namespace='course')),
 
+    # 配置上传那文件的访问处理函数
     url(r'^media/(?P<path>.*)$', serve, {"document_root":MEDIA_ROOT}),
 
 ]

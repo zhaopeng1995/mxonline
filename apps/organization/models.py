@@ -42,12 +42,17 @@ class CourseOrg(models.Model):
     def __unicode__(self):
         return self.name
 
+    # 获取课程机构的教师数量
+    def get_teacher_nums(self):
+        return self.teacher_set.all().count()
+
 
 class Teacher(models.Model):
     name = models.CharField(max_length=50, verbose_name=u'教师名')
     work_years = models.IntegerField(default=0, verbose_name=u'工作年限')
     work_company = models.CharField(max_length=50, verbose_name=u'就职公司')
     work_position = models.CharField(max_length=50, verbose_name=u'公司职位')
+    image = models.ImageField(upload_to="teacher/%Y/%m", null=True, verbose_name=u'照片')
     points = models.CharField(max_length=50, verbose_name=u'教学特点')
     clickNums = models.IntegerField(default=0, verbose_name=u'点击数')
     favNums = models.IntegerField(default=0, verbose_name=u'收藏人数')

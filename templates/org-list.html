@@ -1,12 +1,32 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block title %}课程机构列表-慕学在线网{% endblock %}
+{% block nav %}
+    <nav>
+        <div class="nav">
+            <div class="wp">
+                <ul>
+                    <li class=""><a href="{% url 'index' %}">首页</a></li>
+                    <li>
+                        <a href="{% url 'course:course_list' %}">
+                            公开课<img class="hot" src="{% static 'images/nav_hot.png' %}">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'org:teacher_list' %}">授课教师</a>
+                    </li>
+                    <li class="active"><a href="{% url 'org:org_list' %}">授课机构</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
 {% block custom_bread %}
     <section>
         <div class="wp">
             <ul class="crumbs">
-                <li><a href="index.html">首页</a>></li>
-                <li>课程机构</li>
+                <li><a href="{% url 'index' %}">首页</a>></li>
+                <li><a href="{% url 'org:org_list' %}">课程机构</a>></li>
             </ul>
         </div>
     </section>
@@ -21,19 +41,14 @@
                         <li>
                             <h2>机构类别</h2>
                             <div class="cont">
-
                                 <a href="?city={{ city_id }}&sort={{ sort }}"><span
                                         class="{% ifequal category "" %}active2{% endifequal %}">全部</span></a>
-
                                 <a href="?ct=pxjg&city={{ city_id }}&sort={{ sort }}"><span
                                         class="{% ifequal category "pxjg" %}active2{% endifequal %}">培训机构</span></a>
-
                                 <a href="?ct=gx&city={{ city_id }}&sort={{ sort }}"><span
                                         class="{% ifequal category 'gx' %}active2{% endifequal %}">高校</span></a>
-
                                 <a href="?ct=gr&city={{ city_id }}&sort={{ sort }}"><span
                                         class="{% ifequal category 'gr' %}active2{% endifequal %}">个人</span></a>
-
                             </div>
                         </li>
                         <li>
@@ -68,7 +83,7 @@
                         {% for course_org in all_orgs.object_list %}
                             <dl class="des difdes">
                                 <dt>
-                                    <a href="org-detail-homepage.html">
+                                    <a href="{% url 'org:org_home' course_org.id %}">
                                         <img width="200" height="120" class="scrollLoading"
                                              data-url="{{ MEDIA_URL }}{{ course_org.image }}"
                                              src="{{ MEDIA_URL }}{{ course_org.image }}"/>
@@ -76,7 +91,7 @@
                                 </dt>
                                 <dd>
                                     <div class="clearfix">
-                                        <a href="org-detail-homepage.html">
+                                        <a href="{% url 'org:org_home' course_org.id %}">
                                             <h1>{{ course_org.name }}</h1>
                                             <div class="pic fl">
                                                 <img src="{% static 'images/authentication.png' %}"/>
@@ -85,15 +100,13 @@
                                         </a>
                                     </div>
                                     <ul class="cont">
-                                        <li class="first"><p class="pic9">课程数：<span>{{ course_org.courseNums }}</span></p>
+                                        <li class="first"><p class="pic9">课程数：<span>{{ course_org.courseNums }}</span>
+                                        </p>
                                             <p class="c7">学习人数：<span>{{ course_org.studentNums }}</span></p></li>
                                         <li class="c8" style="padding-left:18px;">{{ course_org.address }}</li>
                                         <li class="pic10" style="padding-left:18px;">经典课程：
-
                                             <a href="/diary/19/">c语言基础入门</a>
-
                                             <a href="/diary/16/">数据库基础</a>
-
                                         </li>
                                     </ul>
                                 </dd>
@@ -144,7 +157,7 @@
                     </div>
                     <p class="error company-tips" id="jsCompanyTips"></p>
                     <input class="btn" type="text" id="jsStayBtn" value="立即咨询 >"/>
-                    <input type='hidden' name='csrfmiddlewaretoken' value='5I2SlleZJOMUX9QbwYLUIAOshdrdpRcy'/>
+                    {% csrf_token %}
                 </form>
             </div>
 
@@ -164,4 +177,26 @@
             </div>
         </div>
     </section>
+
+    <script type="text/javascript">
+        $(function () {
+            $('#jsStayBtn').on('click', function () {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "/org/add_ask/",
+                    data: $('#jsStayForm').serialize(),
+                    async: true,
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            $('#jsStayForm')[0].reset();
+                            alert("提交成功")
+                        } else if (data.status == 'fail') {
+                            $('#jsCompanyTips').html(data.msg)
+                        }
+                    },
+                });
+            });
+        })
+    </script>
 {% endblock %}
