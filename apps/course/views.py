@@ -1,4 +1,5 @@
 # -*- encoding:utf-8 -*-
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
@@ -13,6 +14,16 @@ class CourseListView(View):
     def get(self, request):
         all_courses = Course.objects.all().order_by("-add_time")
         hot_courses = Course.objects.all().order_by("-clickNums")[:3]
+        search_keywords = request.GET.get('keywords', '')
+
+        # 课程搜索
+        if search_keywords:
+            all_courses = all_courses.filter(
+                Q(name__icontains=search_keywords) | \
+                Q(desc__icontains=search_keywords) | \
+                Q(detail__icontains=search_keywords)
+            )
+
         sort = request.GET.get('sort', '')
         if sort:
             if sort == 'students':
@@ -73,10 +84,10 @@ class CourseVideoView(LoginRequiredMixin, View):
         course = Course.objects.get(id=int(course_id))
 
         # 查询该用户是否已经关联了该课程
-        has_learned = UserCourse.objects.filter(user=request.user , course=course)
+        has_learned = UserCourse.objects.filter(user=request.user, course=course)
 
         if not has_learned:
-            new_user_course = UserCourse(user=request.user,  course =course)
+            new_user_course = UserCourse(user=request.user, course=course)
             new_user_course.save()
 
         all_resources = CourseResource.objects.filter(course=course)

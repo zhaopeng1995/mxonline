@@ -1,0 +1,80 @@
+{% extends 'user_base.html' %}
+
+{% block title %}
+    我收藏的课程- 慕学在线网
+{% endblock %}
+
+{% block custom_css %}
+{% endblock %}
+{% block custom_js %}
+{% endblock %}
+{% block crumbs %}
+    <section>
+        <div class="wp">
+            <ul class="crumbs">
+                <li class="active"><a href="{% url 'index' %}">首页</a>></li>
+                <li><a href="">个人中心</a>></li>
+                <li>我的收藏</li>
+            </ul>
+        </div>
+    </section>
+{% endblock %}
+
+{% block left_content %}
+    <div class="left">
+        <ul>
+            <li><a href="{% url 'user:user_info' %}">个人资料</a></li>
+            <li><a href="{% url 'user:user_course' %}">我的课程</a></li>
+            <li class="active2"><a href="{% url 'user:fav_course' %}">我的收藏</a></li>
+            <li>
+                <a href="{% url 'user:user_message' %}" style="position: relative;">
+                    我的消息
+                </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block right_content %}
+    <div class="right">
+        <div class="personal_des Releasecont">
+            <div class="head">
+                <h1>我的收藏</h1>
+            </div>
+        </div>
+        <div class="personal_des permessage">
+            <div class="head">
+                <ul class="tab_header messagehead">
+                    <li><a href="{% url 'user:user_fav_org' %}">课程机构</a></li>
+                    <li><a href="{% url 'user:user_fav_teacher' %}">授课教师 </a></li>
+                    <li class="active"><a href="{% url 'user:user_fav_teacher' %}">公开课程</a></li>
+                </ul>
+
+            </div>
+            <div class="companycenter">
+                <div class="group_list brief">
+
+                    {% for fav_course in all_courses %}
+                        <div class="module1_5 box">
+                            <a href="course-detail.html">
+                                <img width="214" height="190"
+                                     src="{{ MEDIA_URL }}{{ fav_course.image }}"/>
+                            </a>
+                            <div class="des">
+                                <a href="course-detail.html"><h2>{{ fav_course.name }}</h2></a>
+                                <span class="fl">时长：<i class="key">{{ fav_course.learn_times }}</i></span>
+                                <span class="fr">学习人数：{{ fav_course.studentsNums }}</span>
+                            </div>
+                            <div class="bottom">
+                                <span class="fl">{{ fav_course.course_org.name }}</span>
+                                <span class="delete-group fr jsDeleteFav_course" data-favid="12"></span>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

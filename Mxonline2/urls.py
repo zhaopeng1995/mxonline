@@ -16,32 +16,33 @@ Including another URLconf
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
-import xadmin
 from django.views.generic import TemplateView
 from django.views.static import serve
 
+import xadmin
 from Mxonline2.settings import MEDIA_ROOT
-from organization.views import OrgView
-from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView
+from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView, LogOutView
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
     url('^$', TemplateView.as_view(template_name='index.html'), name='index'),
-    # url('^login/$', userlogin, name='login'),
+
     url('^login/$', LoginView.as_view(), name='login'),
     url('^register/$', RegisterView.as_view(), name='register'),
     url(r'^captcha/', include('captcha.urls')),
-    url(r'^active/(?P<active_code>.*)/$', ActiveUserView.as_view(), name='active_user' ),
+    url(r'^active/(?P<active_code>.*)/$', ActiveUserView.as_view(), name='active_user'),
     url(r'^forgetpwd/$', ForgetPwdView.as_view(), name='forgetpwd'),
     url(r'^reset/(?P<active_code>.*)/$', ResetView.as_view(), name='resetpwd'),
     url(r'^modifypwd/$', ModifyPwdView.as_view(), name='modifypwd'),
     # 课程机构url配置
-    url(r'^org/', include('organization.urls',namespace='org')),
+    url(r'^org/', include('organization.urls', namespace='org')),
     # 课程url配置
-    url(r'^course/', include('course.urls',namespace='course')),
-
+    url(r'^course/', include('course.urls', namespace='course')),
+    url(r'^user/', include('users.urls', namespace='user')),
     # 配置上传那文件的访问处理函数
-    url(r'^media/(?P<path>.*)$', serve, {"document_root":MEDIA_ROOT}),
-
+    url(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}),
+    url(r'logout/$', LogOutView.as_view(), name='logout'),
 ]
+
+# 全局404页面配置
+handler404 = 'user.views.'

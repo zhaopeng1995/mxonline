@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
@@ -20,6 +21,14 @@ class OrgView(View):
         # 取出所有城市
         all_cities = CityDict.objects.all()
         # 取出排名前三的机构
+
+        # 机构搜索
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_orgs = all_orgs.filter(
+                Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords)
+            )
+
         hot_orgs = all_orgs.order_by("-clickNums")[:3]
         # 城市筛选
         city_id = request.GET.get('city', "")
@@ -200,6 +209,14 @@ class TeacherListView(View):
         all_teachers = Teacher.objects.all()
         # 取出排名前三的讲师
         hot_teachers = all_teachers.order_by("-favNums")[:3]
+
+        # 机构搜索
+        search_keywords = request.GET.get('keywords', '')
+        if search_keywords:
+            all_teachers = all_teachers.filter(
+                Q(name__icontains=search_keywords) | Q(desc__icontains=search_keywords) |
+                Q(work_company__icontains=search_keywords)
+            )
 
         # 统计筛选后的讲师个数
         teacher_nums = all_teachers.count()
