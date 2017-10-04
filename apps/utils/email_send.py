@@ -7,7 +7,7 @@ from random import Random
 
 from django.core.mail import send_mail
 
-from Mxonline2.settings import EMAIL_FROM
+from Mxonline.settings import EMAIL_FROM
 from users.models import EmailVerifyRecord
 
 

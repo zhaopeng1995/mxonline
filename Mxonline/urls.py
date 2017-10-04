@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Mxonline2 URL Configuration
+"""Mxonline URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.9/topics/http/urls/
@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 from django.views.static import serve
 
 import xadmin
-from Mxonline2.settings import MEDIA_ROOT
+from Mxonline.settings import MEDIA_ROOT
 from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetView, ModifyPwdView, LogOutView
 
 urlpatterns = [
